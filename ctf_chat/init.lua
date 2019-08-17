@@ -409,3 +409,24 @@ minetest.registered_chatcommands["me"].func = function(name, param)
 
 	minetest.chat_send_all(name .. " " .. param)
 end
+
+minetest.register_chatcommand("s", {
+    params = "<msg>",
+    description = "Send a message on the staff channel",
+    privs = {kick=true},
+    func = function(name, param)
+    local staff = {}
+    for _, player in pairs(minetest.get_connected_players()) do
+        local toname = player:get_player_name()
+        if minetest.check_player_privs(toname, {kick=true}) then
+            table.insert(staff, toname)
+            minetest.chat_send_player(toname, minetest.colorize("#ff6600",
+                    "«" .. name .. "» " .. param))
+            minetest.log("action", "CHAT[STAFFCHANNEL]: <" .. name .. "> " .. param)
+		if minetest.global_exists("chatplus") then
+			chatplus.log("[STAFFCHANNEL]: <" .. name .. "> " .. param)
+		end
+        end
+    end
+end
+})
